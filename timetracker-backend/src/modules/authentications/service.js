@@ -10,10 +10,10 @@ async function findUserByUsername(username) {
     
 }
 
-async function create(username,password) {
+async function createUser(username, password) {
     const result = await pool.query(
-        `INSERT INTO (username, password)
-        VALUE($1, $2)
+        `INSERT INTO users (username, password)
+        VALUES ($1, $2)
         RETURNING id, username`
         ,
         [username, password]
@@ -22,6 +22,6 @@ async function create(username,password) {
 }
 
 module.exports = {
-    getUserByUsername,
+    findUserByUsername,
     createUser,
 };

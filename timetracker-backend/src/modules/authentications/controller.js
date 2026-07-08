@@ -1,9 +1,11 @@
+const authService = require("./service");
+
 async function register(req, res) {
     try {
         const { username, password } = req.body;
 
         const existingUser =
-            await findUserByUsername(username);
+            await authService.findUserByUsername(username);
 
         if (existingUser) {
             return res.status(400).json({
@@ -12,7 +14,7 @@ async function register(req, res) {
         }
 
         const user =
-            await createUser(username, password);
+            await authService.createUser(username, password);
 
         res.status(201).json(user);
     } catch (error) {
@@ -29,7 +31,7 @@ async function login(req, res) {
         const { username, password } = req.body;
 
         const user =
-            await getUserByUsername(username);
+            await authService.findUserByUsername(username);
 
         if (!user) {
             return res.status(401).json({
@@ -68,3 +70,9 @@ function logout(req, res) {
         });
     });
 }
+
+module.exports = {
+    register,
+    login,
+    logout
+};
