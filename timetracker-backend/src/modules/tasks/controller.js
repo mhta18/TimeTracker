@@ -1,102 +1,136 @@
 const taskService = require("./service");
 
+function handleError(res, error) {
+    if (error.status) {
+        return res.status(error.status).json({
+            message: error.message
+        });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+        message: "Internal server error."
+    });
+}
+
 async function createTask(req, res) {
-
     try {
-
-        const { project_id, title, description, status } = req.body;
-
-        const userId = req.session.user.id;
-
-        const project = await taskService.checkProjectOwnership(project_id, userId);
-
-        if (!project) {
-
-            return res.status(403).json({
-                message: "Access denied."
-            });
-
-        }
+        const {
+            project_id,
+            assigned_to,
+            title,
+            description,
+            status
+        } = req.body;
 
         const task = await taskService.createTask(
             project_id,
+            req.session.user.id,
+            assigned_to,
             title,
             description,
             status
         );
 
-        res.status(201).json(task);
+        return res.status(201).json(task);
 
+    } catch (error) {
+        return handleError(res, error);
     }
-
-    catch (error) {
-
-        res.status(500).json(error.message);
-
-    }
-
 }
 
 async function getTasks(req, res) {
-
     try {
-        const userId = req.session.user.id;
-        const tasks = await taskService.getTasks(userId);
-        res.status(200).json(tasks);
+
+        const tasks = await taskService.getTasks(
+            req.session.user.id,
+            req.session.user.role
+        );
+
+        return res.json(tasks);
+
     } catch (error) {
-        res.status(500).json(error.message);
+        return handleError(res, error);
     }
 }
 
 async function getTaskById(req, res) {
-
     try {
-        const userId = req.session.user.id;
-        const taskId = req.params.id;
-        const task = await taskService.getTaskById(taskId, userId);
-        res.status(200).json(task);
+
+        const task = await taskService.getTaskById(
+            req.params.id,
+            req.session.user.id,
+            req.session.user.role
+        );
+
+        return res.json(task);
+
     } catch (error) {
-        res.status(500).json(error.message);
+        return handleError(res, error);
     }
 }
 
 async function updateTask(req, res) {
-
     try {
-        const taskId = req.params.id;
-        const { title, description, status, due_date } = req.body;
 
-        const userId = req.session.user.id;
-        const task = await taskService.getTaskById(taskId, userId);
-
-        if (!task) {
-            return res.status(404).json({ message: "Task not found." });
-        }
-
-        const updatedTask = await taskService.updateTask(
-            taskId,
+        const {
             title,
             description,
-            status,
-            due_date
+            assigned_to,
+            status
+        } = req.body;
+
+        const task = await taskService.updateTask(
+            req.params.id,
+            req.session.user.id,
+            req.session.user.role,
+            title,
+            description,
+            assigned_to,
+            status
         );
 
-        res.status(200).json(updatedTask);
+        return res.json(task);
+
     } catch (error) {
-        res.status(500).json(error.message);
+        return handleError(res, error);
+    }
+}
+
+async function updateTaskStatus(req, res) {
+    try {
+
+        const { status } = req.body;
+
+        const task = await taskService.updateTaskStatus(
+            req.params.id,
+            req.session.user.id,
+            status
+        );
+
+        return res.json(task);
+
+    } catch (error) {
+        return handleError(res, error);
     }
 }
 
 async function deleteTask(req, res) {
-
     try {
-        const taskId = req.params.id;
-        const userId = req.session.user.id;
-        const task = await taskService.getTaskById(taskId, userId);
-        await taskService.deleteTask(taskId);
-        res.status(200).json({ message: "Task deleted successfully." });
+
+        await taskService.deleteTask(
+            req.params.id,
+            req.session.user.id,
+            req.session.user.role
+        );
+
+        return res.json({
+            message: "Task deleted successfully."
+        });
+
     } catch (error) {
-        res.status(500).json(error.message);
+        return handleError(res, error);
     }
 }
 
@@ -105,5 +139,6 @@ module.exports = {
     getTasks,
     getTaskById,
     updateTask,
+    updateTaskStatus,
     deleteTask
 };

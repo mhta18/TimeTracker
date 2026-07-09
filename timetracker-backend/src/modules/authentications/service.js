@@ -10,13 +10,13 @@ async function findUserByUsername(username) {
     
 }
 
-async function createUser(username, password) {
+async function createUser(username, password,role) {
     const result = await pool.query(
-        `INSERT INTO users (username, password)
-        VALUES ($1, $2)
+        `INSERT INTO users (username, password, role)
+        VALUES ($1, $2, $3)
         RETURNING id, username`
         ,
-        [username, password]
+        [username, password,role]
     )
     return result.rows[0];
 }

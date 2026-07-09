@@ -2,7 +2,7 @@ const authService = require("./service");
 
 async function register(req, res) {
     try {
-        const { username, password } = req.body;
+        const { username, password,role } = req.body;
 
         const existingUser =
             await authService.findUserByUsername(username);
@@ -14,7 +14,7 @@ async function register(req, res) {
         }
 
         const user =
-            await authService.createUser(username, password);
+            await authService.createUser(username, password, role);
 
         res.status(201).json(user);
     } catch (error) {
@@ -48,6 +48,7 @@ async function login(req, res) {
         req.session.user = {
             id: user.id,
             username: user.username,
+            role: user.role
         };
 
         res.json({

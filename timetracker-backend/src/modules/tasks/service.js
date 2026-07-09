@@ -1,95 +1,393 @@
 const pool = require("../../config/db");
 
-async function checkProjectOwnership(project_id, user_id) {
+const VALID_STATUS = [
+    "todo",
+    "in_progress",
+    "completed"
+];
+
+async function createTask(
+    projectId,
+    userId,
+    assignedTo,
+    title,
+    description,
+    status = "todo"
+) {
+
+    if (!VALID_STATUS.includes(status)) {
+        throw {
+            status: 400,
+            message: "Invalid task status."
+        };
+    }
+
+    const project = await pool.query(
+        `
+        SELECT *
+        FROM projects
+        WHERE id=$1
+        AND team_id IN (
+            SELECT team_id
+            FROM teams
+            WHERE supervisor_id=$2
+        )
+        `,
+        [projectId, userId]
+    );
+
+    if (project.rows.length === 0) {
+        throw {
+            status: 403,
+            message: "You do not own this project."
+        };
+    }
+
+    const member = await pool.query(
+        `
+        SELECT *
+        FROM team_members tm
+
+        JOIN teams t
+        ON tm.team_id=t.id
+
+        WHERE
+            tm.user_id=$1
+        AND t.supervisor_id=$2
+        `,
+        [assignedTo, userId]
+    );
+
+    if (member.rows.length === 0) {
+        throw {
+            status: 403,
+            message: "Assigned user is not in your team."
+        };
+    }
+
     const result = await pool.query(
         `
-        SELECT * FROM projects
-        WHERE id = $1 AND user_id = $2
+        INSERT INTO tasks
+        (
+            project_id,
+            created_by,
+            assigned_to,
+            title,
+            description,
+            status
+        )
+
+        VALUES($1,$2,$3,$4,$5,$6)
+
+        RETURNING *;
         `,
-        [project_id, user_id]
+        [
+            projectId,
+            userId,
+            assignedTo,
+            title,
+            description,
+            status
+        ]
     );
+
     return result.rows[0];
+
 }
 
-async function createTask(project_id, title, description, status, due_date) {
-    const result = await pool.query(
-        `
-        INSERT INTO tasks(project_id,title,description,status,due_date)
-        VALUES($1,$2,$3,$4,$5)
-        RETURNING *
-        `,
-        [project_id, title, description, status, due_date]
-    );
+async function getTasks(userId, role) {
 
-    return result.rows[0];
-}
+    let query;
+    let values = [];
 
-async function getTasks(user_id) {
-    const result = await pool.query(
-        `
-        SELECT
-        tasks.*
-        FROM tasks
-        JOIN projects
-        ON tasks.project_id = projects.id
-        WHERE projects.user_id=$1;
-        `,
-        [user_id]
-    );
+    if (role === "admin") {
+
+        query = `
+            SELECT *
+            FROM tasks
+            ORDER BY id DESC
+        `;
+
+    }
+
+    else if (role === "supervisor") {
+
+        query = `
+            SELECT *
+            FROM tasks
+            WHERE created_by=$1
+            ORDER BY id DESC
+        `;
+
+        values = [userId];
+
+    }
+
+    else {
+
+        query = `
+            SELECT *
+            FROM tasks
+            WHERE assigned_to=$1
+            ORDER BY id DESC
+        `;
+
+        values = [userId];
+
+    }
+
+    const result = await pool.query(query, values);
 
     return result.rows;
+
 }
 
-async function getTaskById(id,user_id) {
-    const result = await pool.query(
-        `
-        SELECT
-        tasks.*
-        FROM tasks
-        JOIN projects
-        ON tasks.project_id=projects.id
-        WHERE tasks.id=$1
-        AND projects.user_id=$2;
-        `,
-        [id, user_id]
-    );
+async function getTaskById(id, userId, role) {
+
+    let query;
+    let values;
+
+    if (role === "admin") {
+
+        query = `
+            SELECT *
+            FROM tasks
+            WHERE id=$1
+        `;
+
+        values = [id];
+
+    }
+
+    else {
+
+        query = `
+            SELECT *
+            FROM tasks
+
+            WHERE id=$1
+
+            AND
+            (
+                created_by=$2
+                OR assigned_to=$2
+            )
+        `;
+
+        values = [id, userId];
+
+    }
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+        throw {
+            status: 404,
+            message: "Task not found."
+        };
+    }
 
     return result.rows[0];
+
 }
 
-async function updateTask(id, title, description, status, due_date) {
+async function updateTask(
+    id,
+    userId,
+    role,
+    title,
+    description,
+    assignedTo,
+    status
+) {
+
+    if (!VALID_STATUS.includes(status)) {
+        throw {
+            status: 400,
+            message: "Invalid task status."
+        };
+    }
+
+    if (role !== "admin") {
+
+        const owner = await pool.query(
+            `
+            SELECT *
+            FROM tasks
+
+            WHERE id=$1
+
+            AND created_by=$2
+            `,
+            [
+                id,
+                userId
+            ]
+        );
+
+        if (owner.rows.length === 0) {
+            throw {
+                status: 403,
+                message: "Access denied."
+            };
+        }
+
+        const member = await pool.query(
+            `
+            SELECT *
+            FROM team_members tm
+
+            JOIN teams t
+            ON tm.team_id=t.id
+
+            WHERE
+                tm.user_id=$1
+            AND t.supervisor_id=$2
+            `,
+            [
+                assignedTo,
+                userId
+            ]
+        );
+
+        if (member.rows.length === 0) {
+            throw {
+                status: 403,
+                message: "Assigned user is not in your team."
+            };
+        }
+    }
+
     const result = await pool.query(
         `
         UPDATE tasks
+
         SET
+
             title=$1,
             description=$2,
-            status=$3,
-            due_date=$4
+            assigned_to=$3,
+            status=$4
+
         WHERE id=$5
-        RETURNING *
+
+        RETURNING *;
         `,
-        [title, description, status, due_date, id]
+        [
+            title,
+            description,
+            assignedTo,
+            status,
+            id
+        ]
     );
 
     return result.rows[0];
+
 }
 
-async function deleteTask(id) {
-    await pool.query(
+async function updateTaskStatus(
+    id,
+    memberId,
+    status
+) {
+
+    if (!VALID_STATUS.includes(status)) {
+        throw {
+            status: 400,
+            message: "Invalid task status."
+        };
+    }
+
+    const result = await pool.query(
         `
-        DELETE FROM tasks
-        WHERE id=$1
+        UPDATE tasks
+
+        SET status=$1
+
+        WHERE
+
+            id=$2
+
+        AND assigned_to=$3
+
+        RETURNING *;
         `,
-        [id]
+        [
+            status,
+            id,
+            memberId
+        ]
     );
+
+    if (result.rows.length === 0) {
+        throw {
+            status: 403,
+            message: "You are not assigned to this task."
+        };
+    }
+
+    return result.rows[0];
+
+}
+
+async function deleteTask(
+    id,
+    userId,
+    role
+) {
+
+    let result;
+
+    if (role === "admin") {
+
+        result = await pool.query(
+            `
+            DELETE FROM tasks
+            WHERE id=$1
+            RETURNING *;
+            `,
+            [id]
+        );
+
+    }
+
+    else {
+
+        result = await pool.query(
+            `
+            DELETE FROM tasks
+
+            WHERE
+                id=$1
+            AND created_by=$2
+
+            RETURNING *;
+            `,
+            [
+                id,
+                userId
+            ]
+        );
+
+    }
+
+    if (result.rows.length === 0) {
+        throw {
+            status: 403,
+            message: "Access denied."
+        };
+    }
+
+    return result.rows[0];
+
 }
 
 module.exports = {
-    checkProjectOwnership,
     createTask,
     getTasks,
     getTaskById,
     updateTask,
+    updateTaskStatus,
     deleteTask
 };

@@ -1,16 +1,13 @@
 const pool = require("../../config/db");
 
-// Check if task belongs to logged-in user
 async function checkTaskOwnership(taskId, userId) {
 
     const result = await pool.query(
         `
-        SELECT tasks.id
+        SELECT *
         FROM tasks
-        JOIN projects
-        ON tasks.project_id = projects.id
-        WHERE tasks.id = $1
-        AND projects.user_id = $2
+        WHERE id = $1
+        AND assigned_to = $2;
         `,
         [taskId, userId]
     );
@@ -18,163 +15,218 @@ async function checkTaskOwnership(taskId, userId) {
     return result.rows[0];
 }
 
+async function checkRunningTimer(taskId) {
 
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM time_entries
+        WHERE task_id = $1
+        AND status = 'running';
+        `,
+        [taskId]
+    );
 
-// Create a time entry
-async function createTimeEntry(
-    taskId,
-    startTime,
-    endTime,
-    duration
-) {
+    return result.rows[0];
+}
+
+async function checkPausedTimer(taskId) {
+
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM time_entries
+        WHERE task_id = $1
+        AND status = 'paused';
+        `,
+        [taskId]
+    );
+
+    return result.rows[0];
+}
+
+async function startTimer(taskId, userId) {
+
+    const task = await checkTaskOwnership(taskId, userId);
+
+    if (!task) {
+        throw { status: 403, message: "Access denied." };
+    }
+
+    const running = await checkRunningTimer(taskId);
+
+    if (running) {
+        throw { status: 400, message: "Timer is already running." };
+    }
 
     const result = await pool.query(
         `
         INSERT INTO time_entries
-        (task_id, start_time, end_time, duration)
-        VALUES($1,$2,$3,$4)
-        RETURNING *
+        (
+            task_id,
+            start_time,
+            last_started_at,
+            status,
+            total_duration
+        )
+        VALUES
+        (
+            $1,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            'running',
+            0
+        )
+        RETURNING *;
         `,
-        [
-            taskId,
-            startTime,
-            endTime,
-            duration
-        ]
+        [taskId]
     );
 
     return result.rows[0];
 }
 
+async function pauseTimer(taskId, userId) {
 
+    const task = await checkTaskOwnership(taskId, userId);
 
-// Get all time entries of a user
-async function getTimeEntries(userId) {
+    if (!task) {
+        throw { status: 403, message: "Access denied." };
+    }
 
-    const result = await pool.query(
-        `
-        SELECT 
-            time_entries.*
-        FROM time_entries
+    const timer = await checkRunningTimer(taskId);
 
-        JOIN tasks
-        ON time_entries.task_id = tasks.id
-
-        JOIN projects
-        ON tasks.project_id = projects.id
-
-        WHERE projects.user_id = $1
-
-        ORDER BY time_entries.created_at DESC
-        `,
-        [userId]
-    );
-
-
-    return result.rows;
-}
-
-
-
-// Get one time entry
-async function getTimeEntryById(id, userId) {
-
-    const result = await pool.query(
-        `
-        SELECT
-            time_entries.*
-        FROM time_entries
-
-        JOIN tasks
-        ON time_entries.task_id = tasks.id
-
-        JOIN projects
-        ON tasks.project_id = projects.id
-
-        WHERE time_entries.id = $1
-        AND projects.user_id = $2
-        `,
-        [
-            id,
-            userId
-        ]
-    );
-
-
-    return result.rows[0];
-}
-
-
-
-// Update time entry
-async function updateTimeEntry(
-    id,
-    userId,
-    startTime,
-    endTime,
-    duration
-) {
+    if (!timer) {
+        throw { status: 400, message: "No running timer found." };
+    }
 
     const result = await pool.query(
         `
         UPDATE time_entries
 
         SET
-        start_time = $1,
-        end_time = $2,
-        duration = $3
-
-        WHERE id = $4
-
-        AND task_id IN (
-
-            SELECT tasks.id
-            FROM tasks
-
-            JOIN projects
-            ON tasks.project_id = projects.id
-
-            WHERE projects.user_id = $5
-        )
-
-        RETURNING *
-        `,
-        [
-            startTime,
-            endTime,
-            duration,
-            id,
-            userId
-        ]
-    );
-
-
-    return result.rows[0];
-}
-
-
-
-// Delete time entry
-async function deleteTimeEntry(id, userId) {
-
-    const result = await pool.query(
-        `
-        DELETE FROM time_entries
+            total_duration =
+                total_duration +
+                EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - last_started_at)),
+            last_started_at = NULL,
+            status = 'paused'
 
         WHERE id = $1
 
-        AND task_id IN (
+        RETURNING *;
+        `,
+        [timer.id]
+    );
 
-            SELECT tasks.id
-            FROM tasks
+    return result.rows[0];
+}
 
-            JOIN projects
-            ON tasks.project_id = projects.id
+async function resumeTimer(taskId, userId) {
 
-            WHERE projects.user_id = $2
-        )
+    const task = await checkTaskOwnership(taskId, userId);
 
-        RETURNING *
+    if (!task) {
+        throw { status: 403, message: "Access denied." };
+    }
+
+    const timer = await checkPausedTimer(taskId);
+
+    if (!timer) {
+        throw { status: 400, message: "Timer is not paused." };
+    }
+
+    const result = await pool.query(
+        `
+        UPDATE time_entries
+
+        SET
+            status='running',
+            last_started_at=CURRENT_TIMESTAMP
+
+        WHERE id=$1
+
+        RETURNING *;
+        `,
+        [timer.id]
+    );
+
+    return result.rows[0];
+}
+
+async function stopTimer(taskId, userId) {
+
+    const task = await checkTaskOwnership(taskId, userId);
+
+    if (!task) {
+        throw { status: 403, message: "Access denied." };
+    }
+
+    const timer = await checkRunningTimer(taskId);
+
+    if (!timer) {
+        throw { status: 400, message: "No running timer found." };
+    }
+
+    const result = await pool.query(
+        `
+        UPDATE time_entries
+
+        SET
+
+            total_duration =
+                total_duration +
+                EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - last_started_at)),
+
+            end_time = CURRENT_TIMESTAMP,
+
+            last_started_at = NULL,
+
+            status = 'stopped'
+
+        WHERE id = $1
+
+        RETURNING *;
+        `,
+        [timer.id]
+    );
+
+    return result.rows[0];
+}
+
+async function getTimeEntries(userId) {
+
+    const result = await pool.query(
+        `
+        SELECT te.*
+
+        FROM time_entries te
+
+        JOIN tasks t
+        ON te.task_id = t.id
+
+        WHERE t.assigned_to = $1
+
+        ORDER BY te.created_at DESC;
+        `,
+        [userId]
+    );
+
+    return result.rows;
+}
+
+async function getTimeEntryById(id, userId) {
+
+    const result = await pool.query(
+        `
+        SELECT te.*
+
+        FROM time_entries te
+
+        JOIN tasks t
+        ON te.task_id = t.id
+
+        WHERE te.id = $1
+
+        AND t.assigned_to = $2;
         `,
         [
             id,
@@ -182,17 +234,14 @@ async function deleteTimeEntry(id, userId) {
         ]
     );
 
-
     return result.rows[0];
 }
 
-
-
 module.exports = {
-    createTimeEntry,
+    startTimer,
+    pauseTimer,
+    resumeTimer,
+    stopTimer,
     getTimeEntries,
-    getTimeEntryById,
-    updateTimeEntry,
-    deleteTimeEntry,
-    checkTaskOwnership
+    getTimeEntryById
 };

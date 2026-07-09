@@ -1,16 +1,43 @@
 const router = require("express").Router();
 
 const controller = require("./controller");
-const authMiddleware = require("../../middlewares/middleware");
 
-router.get("/", authMiddleware, controller.getTimeEntries);
+const authMiddleware = require("../../middlewares/authMiddleware");
 
-router.get("/:id", authMiddleware, controller.getTimeEntryById);
+router.post(
+    "/start/:taskId",
+    authMiddleware,
+    controller.startTimer
+);
 
-router.post("/", authMiddleware, controller.createTimeEntry);
+router.patch(
+    "/pause/:taskId",
+    authMiddleware,
+    controller.pauseTimer
+);
 
-router.put("/:id", authMiddleware, controller.updateTimeEntry);
+router.patch(
+    "/resume/:taskId",
+    authMiddleware,
+    controller.resumeTimer
+);
 
-router.delete("/:id", authMiddleware, controller.deleteTimeEntry);
+router.patch(
+    "/stop/:taskId",
+    authMiddleware,
+    controller.stopTimer
+);
+
+router.get(
+    "/",
+    authMiddleware,
+    controller.getTimeEntries
+);
+
+router.get(
+    "/:id",
+    authMiddleware,
+    controller.getTimeEntryById
+);
 
 module.exports = router;

@@ -1,122 +1,116 @@
 const timeEntryService = require("./service");
 
-async function createTimeEntry(req, res) {
+function handleError(res, error) {
 
+    if (error.status) {
+        return res.status(error.status).json({
+            message: error.message
+        });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+        message: "Internal server error."
+    });
+}
+
+async function startTimer(req, res) {
     try {
-
+        const { taskId } = req.params;
         const userId = req.session.user.id;
 
-        const {
-            task_id,
-            start_time,
-            end_time
-        } = req.body;
+        const timeEntry = await timeEntryService.startTimer(taskId, userId);
 
+        return res.status(201).json(timeEntry);
 
-        const task =
-            await timeEntryService.checkTaskOwnership(
-                task_id,
-                userId
-            );
+    } catch (error) {
+        return handleError(res, error);
+    }
+}
 
+async function pauseTimer(req, res) {
+    try {
+        const { taskId } = req.params;
+        const userId = req.session.user.id;
 
-        if (!task) {
+        const timeEntry = await timeEntryService.pauseTimer(taskId,userId);
 
-            return res.status(403).json({
-                message: "You cannot add time to this task"
-            });
+        return res.json(timeEntry);
 
-        }
+    } catch (error) {
+        return handleError(res, error);
+    }
+}
 
+async function resumeTimer(req, res) {
+    try {
+        const { taskId } = req.params;
+        const userId = req.session.user.id;
 
-        const duration =
-            Math.floor(
-                (new Date(end_time) - new Date(start_time))
-                / 60000
-            );
+        const timeEntry = await timeEntryService.resumeTimer(taskId, userId);
 
+        return res.json(timeEntry);
 
-        const entry =
-            await timeEntryService.createTimeEntry(
-                task_id,
-                start_time,
-                end_time,
-                duration
-            );
+    } catch (error) {
+        return handleError(res, error);
+    }
+}
 
+async function stopTimer(req, res) {
+    try {
+        const { taskId } = req.params;
+        const userId = req.session.user.id;
 
-        res.status(201).json(entry);
+        const timeEntry = await timeEntryService.stopTimer(taskId, userId);
 
+        return res.json(timeEntry);
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
-
+        return handleError(res, error);
     }
-
 }
 
 async function getTimeEntries(req, res) {
-
     try {
         const userId = req.session.user.id;
-        const entries = await timeEntryService.getTimeEntries(userId);
-        res.json(entries);
+
+        const timeEntries = await timeEntryService.getTimeEntries(userId);
+
+        return res.json(timeEntries);
+
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        return handleError(res, error);
     }
 }
+
 async function getTimeEntryById(req, res) {
-
     try {
-        const userId = req.session.user.id;
         const { id } = req.params;
-        const entry = await timeEntryService.getTimeEntryById(id, userId);
-        res.json(entry);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
-}
-
-async function updateTimeEntry(req, res) {
-
-    try {
         const userId = req.session.user.id;
-        const { id } = req.params;
-        const { start_time, end_time, duration } = req.body;
-        const entry = await timeEntryService.updateTimeEntry(id, userId, start_time, end_time, duration);
-        res.json(entry);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
-}
 
-async function deleteTimeEntry(req, res) {
+        const timeEntry = await timeEntryService.getTimeEntryById(id, userId);
 
-    try {
-        const userId = req.session.user.id;
-        const { id } = req.params;
-        const entry = await timeEntryService.deleteTimeEntry(id, userId);
-        res.json(entry);
+        if (!timeEntry) {
+            return handleError(res, {
+                status: 404,
+                message: "Time entry not found."
+            });
+        }
+
+        return res.json(timeEntry);
+
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        return handleError(res, error);
     }
 }
 
 module.exports = {
-    createTimeEntry,
+    startTimer,
+    pauseTimer,
+    resumeTimer,
+    stopTimer,
     getTimeEntries,
-    getTimeEntryById,
-    updateTimeEntry,
-    deleteTimeEntry
+    getTimeEntryById
 };
