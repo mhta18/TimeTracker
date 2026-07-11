@@ -1,96 +1,109 @@
 import { useState } from "react";
-
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { FaClock } from "react-icons/fa";
 import api from "../../api/api";
+import "./Login.css";
 
-import Input from "../../components/Input/Input";
-import Button from "../../components/Button/Button";
-import AuthLayout from "../../components/AuthLayout/AuthLayout";
+export default function Register() {
+    const navigate = useNavigate();
 
-function Register() {
+    const [form, setForm] = useState({
+        username: "",
+        password: "",
+    });
 
-    const [username, setUsername] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const [password, setPassword] = useState("");
+    function handleChange(e) {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value,
+        });
+    }
 
     async function handleSubmit(e) {
-
         e.preventDefault();
 
+        setError("");
+        setLoading(true);
+
         try {
+            await api.post(
+                "/auth/register",
+                form
+            );
 
-            await api.post("/auth/register", {
-
-                username,
-                password
-
-            });
-
-            alert("Registered successfully");
-
+            navigate("/login");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "Registration failed."
+            );
+        } finally {
+            setLoading(false);
         }
-
-        catch (err) {
-
-            alert(err.response.data.message);
-
-        }
-
     }
 
     return (
+        <div className="login-page">
+            <div className="login-container">
 
-        <AuthLayout title="Register">
+                <h1 className="logo">
+                    <FaClock />
+                    TimeTracker
+                </h1>
 
-            <form onSubmit={handleSubmit}>
+                <h2>Create Account</h2>
 
-                <Input
+                <p className="subtitle">
+                    Create your account to start managing projects.
+                </p>
 
-                    label="Username"
+                {error && (
+                    <p className="error-message">
+                        {error}
+                    </p>
+                )}
 
-                    value={username}
+                <form
+                    className="login-form"
+                    onSubmit={handleSubmit}
+                >
 
-                    onChange={(e) => setUsername(e.target.value)}
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={form.username}
+                        onChange={handleChange}
+                        required
+                    />
 
-                />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <Input
+                    <button
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading ? "Creating..." : "Register"}
+                    </button>
 
-                    label="Password"
+                </form>
 
-                    type="password"
+                <p className="register-link">
+                    Already have an account?
+                    <Link to="/login"> Login</Link>
+                </p>
 
-                    value={password}
-
-                    onChange={(e) => setPassword(e.target.value)}
-
-                />
-
-                <Button type="submit">
-
-                    Register
-
-                </Button>
-
-            </form>
-
-            <p>
-
-                Already have an account?
-
-                <Link to="/">
-
-                    Login
-
-                </Link>
-
-            </p>
-
-        </AuthLayout>
-
+            </div>
+        </div>
     );
-
 }
-
-export default Register;

@@ -1,0 +1,15 @@
+.card {
+
+    background: white;
+
+    border-radius: 12px;
+    height: 200px;
+
+    padding: 25px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+
+}
+.taskCard{
+    padding: 30px;
+}

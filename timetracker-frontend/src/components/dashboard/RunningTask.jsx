@@ -1,3 +1,5 @@
+import "../dashboard/Sections.css";
+
 function RunningTask({ task }) {
 
     return (
@@ -5,7 +7,7 @@ function RunningTask({ task }) {
         <div className="card">
 
             <h3>Running Task</h3>
-
+            <br />
             {
 
                 task ?

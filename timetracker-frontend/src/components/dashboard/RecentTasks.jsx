@@ -1,8 +1,9 @@
+import "../dashboard/Sections.css";
 function RecentTasks({ tasks }) {
 
     return (
 
-        <div>
+        <div className="card">
 
             <h2>Recent Tasks</h2>
 

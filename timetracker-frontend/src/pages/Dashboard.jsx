@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
-import StatCard from "../components/StatCard";
-import RunningTask from "../components/RunningTask";
-import RecentTasks from "../components/RecentTasks";
-import QuickActions from "../components/QuickActions";
+import "./Dashboard.css";
+
+import StatCard from "../components/dashboard/StatCard";
+import RunningTask from "../components/dashboard/RunningTask";
+import RecentTasks from "../components/dashboard/RecentTasks";
+import QuickActions from "../components/dashboard/QuickActions";
+
+import {
+    FaFolder,
+    FaTasks,
+    FaClock,
+    FaCheckCircle,
+} from "react-icons/fa";
 
 function Dashboard() {
     const [projects, setProjects] = useState([]);
@@ -24,40 +33,75 @@ function Dashboard() {
             setTasks(tasksRes.data);
 
             const running = tasksRes.data.find(
-                task => task.status === "In Progress"
+                (task) => task.status === "In Progress"
             );
 
             setRunningTask(running || null);
-
         } catch (error) {
             console.error(error);
         }
     }
 
+    const completedTasks = tasks.filter(
+        (task) => task.status === "Completed"
+    ).length;
+
     return (
-        <div className="dashboard">
+        <div className="dashboard-page">
 
-            <h1>Dashboard</h1>
+            <h1 className="dashboard-title">
+                Dashboard
+            </h1>
 
-            <div className="stats">
+            <div className="stats-grid">
 
                 <StatCard
                     title="Projects"
                     value={projects.length}
+                    icon={<FaFolder />}
                 />
 
                 <StatCard
                     title="Tasks"
                     value={tasks.length}
+                    icon={<FaTasks />}
+                />
+
+                <StatCard
+                    title="Completed"
+                    value={completedTasks}
+                    icon={<FaCheckCircle />}
+                />
+
+                <StatCard
+                    title="Running"
+                    value={runningTask ? "1" : "0"}
+                    icon={<FaClock />}
                 />
 
             </div>
 
-            <RunningTask task={runningTask} />
+            <div className="dashboard-content">
 
-            <RecentTasks tasks={tasks.slice(0, 5)} />
+                <div className="dashboard-left">
 
-            <QuickActions />
+                    <RunningTask
+                        task={runningTask}
+                    />
+
+                    <QuickActions />
+
+                </div>
+
+                <div className="dashboard-right">
+
+                    <RecentTasks
+                        tasks={tasks.slice(0, 5)}
+                    />
+
+                </div>
+
+            </div>
 
         </div>
     );

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Dashboard from "./pages/Dashboard";
+import DashboardLayout from "./pages/DashboardLayout";
 import './App.css'
 
 function App() {
@@ -16,11 +17,44 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<DashboardLayout />}>
+
+            <Route
+              path="/dashboard"
+              element={<Dashboard />}
+            />
+
+            {/* <Route
+              path="/projects"
+              element={<Projects />}
+            />
+
+            <Route
+              path="/tasks"
+              element={<Tasks />}
+            />
+
+            <Route
+              path="/teams"
+              element={<Teams />}
+            />
+
+            <Route
+              path="/timer"
+              element={<Timer />}
+            />
+
+            <Route
+              path="/history"
+              element={<History />}
+            /> */}
+
+          </Route>
+
 
       </Routes>
 

@@ -1,97 +1,115 @@
 import { useState } from "react";
-
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { FaClock } from "react-icons/fa";
 import api from "../../api/api";
+import "./Login.css";
 
-import Input from "../../components/Input/Input";
-import Button from "../../components/Button/Button";
-import AuthLayout from "../../components/AuthLayout/AuthLayout";
+export default function Login() {
+    const navigate = useNavigate();
 
-function Login() {
+    const [form, setForm] = useState({
+        username: "",
+        password: "",
+    });
 
-    const [username, setUsername] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const [password, setPassword] = useState("");
+    function handleChange(e) {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value,
+        });
+    }
 
     async function handleSubmit(e) {
-
         e.preventDefault();
 
+        setError("");
+        setLoading(true);
+
         try {
+            const response = await api.post(
+                "/auth/login",
+                form,
+                { withCredentials: true }
+            );
 
-            await api.post("/auth/login", {
+            localStorage.setItem(
+                "user",
+                JSON.stringify(response.data.user)
+            );
 
-                username,
-                password
-
-            });
-
-            alert("Logged in");
-            window.location.href = "/dashboard";
-
+            navigate("/dashboard");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "Invalid username or password."
+            );
+        } finally {
+            setLoading(false);
         }
-
-        catch (err) {
-
-            alert(err.response.data.message);
-
-        }
-
     }
 
     return (
+        <div className="login-page">
+            <div className="login-container">
 
-        <AuthLayout title="Login">
+                <h1 className="logo">
+                    <FaClock />
+                    TimeTracker
+                </h1>
 
-            <form onSubmit={handleSubmit}>
+                <h2>Welcome Back</h2>
 
-                <Input
+                <p className="subtitle">
+                    Login to continue managing your projects.
+                </p>
 
-                    label="Username"
+                {error && (
+                    <p className="error-message">
+                        {error}
+                    </p>
+                )}
 
-                    value={username}
+                <form
+                    className="login-form"
+                    onSubmit={handleSubmit}
+                >
 
-                    onChange={(e) => setUsername(e.target.value)}
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={form.username}
+                        onChange={handleChange}
+                        required
+                    />
 
-                />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <Input
+                    <button
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
 
-                    label="Password"
+                </form>
 
-                    type="password"
+                <p className="register-link">
+                    Don't have an account?
+                    <Link to="/register"> Register</Link>
+                </p>
 
-                    value={password}
-
-                    onChange={(e) => setPassword(e.target.value)}
-
-                />
-
-                <Button type="submit">
-
-                    Login
-
-                </Button>
-
-            </form>
-
-            <p>
-
-                Don't have an account?
-
-                <Link to="/register">
-
-                    Register
-
-                </Link>
-
-            </p>
-
-        </AuthLayout>
-
+            </div>
+        </div>
     );
-
 }
-
-export default Login;
