@@ -1,0 +1,119 @@
+.project-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 24px;
+
+}
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+.form-group label {
+
+    margin-bottom: 8px;
+
+    color: #495568;
+
+    font-weight: 600;
+
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+
+    padding: 12px 15px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    transition: .2s;
+
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+
+    outline: none;
+
+    border-color: #5b4cf5;
+
+    box-shadow: 0 0 0 4px rgba(91, 76, 245, .15);
+
+}
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+
+}
+
+.form-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 15px;
+
+    margin-top: 10px;
+
+}
+
+.cancel-btn {
+
+    padding: 12px 22px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #e5e7eb;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+}
+
+.submit-btn {
+
+    padding: 12px 26px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #5b4cf5;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .2s;
+
+}
+
+.submit-btn:hover {
+
+    background: #4636ec;
+
+}

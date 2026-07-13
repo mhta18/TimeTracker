@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getProjects, deleteProject } from "../services/projectService";
-
+import api from "../api/api";
 import ProjectTable from "../components/projects/ProjectTable";
 
 import "./Projects.css";
@@ -20,17 +19,11 @@ export default function Projects() {
     async function loadProjects() {
 
         try {
-
-            const data = await getProjects();
-
-            setProjects(data);
-
-        }
-
-        catch (error) {
-
+            const response = await api.get("/projects/", { withCredentioals: true });
+            setProjects(response.data);
+        } catch (error) {
+            setProjects(null)
             console.error(error);
-
         }
 
     }
@@ -41,10 +34,11 @@ export default function Projects() {
 
         try {
 
-            await deleteProject(id);
+            await api.delete(`/projects/${id}`);
 
-            loadProjects();
-
+            setProjects(current =>
+                current.filter(project => project.id !== id)
+            );
         }
 
         catch (error) {

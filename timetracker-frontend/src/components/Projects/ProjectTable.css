@@ -1,0 +1,109 @@
+.project-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .05);
+
+}
+
+.project-table thead {
+
+    background: #f8fafc;
+
+}
+
+.project-table th {
+
+    text-align: left;
+
+    padding: 18px;
+
+    color: #374151;
+
+}
+
+.project-table td {
+
+    padding: 18px;
+
+    border-top: 1px solid #edf2f7;
+
+}
+
+.project-table tbody tr:hover {
+
+    background: #f9fafb;
+
+}
+
+.actions {
+
+    display: flex;
+
+    gap: 18px;
+
+    align-items: center;
+
+}
+
+.actions a {
+
+    color: #5b4cf0;
+
+}
+
+.actions button {
+
+    border: none;
+
+    background: none;
+
+    cursor: pointer;
+
+    color: #ef4444;
+
+}
+
+.status {
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+.status.active {
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+}
+
+.status.completed {
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+}
+
+.status.onhold {
+
+    background: #fef3c7;
+
+    color: #b45309;
+
+}

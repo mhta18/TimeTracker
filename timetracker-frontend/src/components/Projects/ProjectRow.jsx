@@ -10,8 +10,6 @@ import {
 
 } from "react-icons/fa";
 
-import ProjectStatus from "./ProjectStatus";
-
 export default function ProjectRow({
 
     project,
@@ -30,9 +28,11 @@ export default function ProjectRow({
 
             <td>
 
-                <ProjectStatus
-                    status={project.status}
-                />
+                <span>
+
+                    {project.status}
+
+                </span>
 
             </td>
 

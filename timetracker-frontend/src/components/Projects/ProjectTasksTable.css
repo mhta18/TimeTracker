@@ -1,0 +1,80 @@
+.project-tasks-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e8ebf1;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .04);
+}
+
+.card-header {
+    margin-bottom: 20px;
+}
+
+.card-header h3 {
+    font-size: 20px;
+    color: #222;
+}
+
+.project-task-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.project-task-table th,
+.project-task-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.project-task-table th {
+    color: #555;
+    background: #fafafa;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+.actions a,
+.actions button {
+    background: none;
+    border: none;
+    color: #5b4bff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.actions button:hover,
+.actions a:hover {
+    color: #4338ca;
+}
+
+.empty {
+    text-align: center;
+    color: gray;
+    padding: 30px;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status.completed {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.status.in-progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status.todo {
+    background: #e5e7eb;
+    color: #374151;
+}

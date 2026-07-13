@@ -10,13 +10,13 @@ function QuickActions() {
 
             <h3>Quick Actions</h3>
             <br />
-            <Link to="/projects/">
+            <Link to="/projects/create">
                 Create Project
             </Link>
 
             <br />
 
-            <Link to="/tasks/">
+            <Link to="/tasks/create">
                 Create Task
             </Link>
 

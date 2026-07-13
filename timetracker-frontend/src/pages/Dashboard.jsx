@@ -49,9 +49,6 @@ function Dashboard() {
     return (
         <div className="dashboard-page">
 
-            <h1 className="dashboard-title">
-                Dashboard
-            </h1>
 
             <div className="stats-grid">
 
