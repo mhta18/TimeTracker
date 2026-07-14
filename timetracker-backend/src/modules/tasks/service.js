@@ -1,7 +1,7 @@
 const pool = require("../../config/db");
 
 const VALID_STATUS = [
-    "To_DO",
+    "To_Do",
     "In_Progress",
     "Completed"
 ];
@@ -12,7 +12,7 @@ async function createTask(
     assignedTo,
     title,
     description,
-    status = "todo"
+    status 
 ) {
 
     if (!VALID_STATUS.includes(status)) {

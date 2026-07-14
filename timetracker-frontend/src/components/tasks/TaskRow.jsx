@@ -31,9 +31,6 @@ export default function TaskRow({
                     {task.status}
                 </span>
             </td>
-
-            <td>{task.priority}</td>
-
             <td>
                 {task.due_date
                     ? new Date(task.due_date).toLocaleDateString()

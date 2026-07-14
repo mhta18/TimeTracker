@@ -23,7 +23,6 @@ async function createTask(req, res) {
             description,
             status
         } = req.body;
-
         const task = await taskService.createTask(
             project_id,
             req.session.user.id,

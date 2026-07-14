@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 import {
     FaTachometerAlt,
     FaFolder,
@@ -15,9 +16,15 @@ export default function Sidebar({ user }) {
 
     const navigate = useNavigate();
 
-    function logout() {
-        localStorage.removeItem("user");
-        navigate("/login");
+    async function handleLogout() {
+        try {
+            await api.post("/auth/logout");
+
+            navigate("/login");
+        } catch (error) {
+            console.error("Failed to logout from server:", error);
+            navigate("/login");
+        }
     }
 
 
@@ -56,15 +63,17 @@ export default function Sidebar({ user }) {
                         Teams
                     </NavLink>
                 )}
-
-                <NavLink to="/timer">
-                    <FaClock />
-                    Timer
-                </NavLink>
+                
+                {user?.role === "member" && (
+                    <NavLink to="/timer">
+                        <FaClock />
+                        Timer
+                    </NavLink>
+                )}
 
             </nav>
 
-            <button className="logout-btn" onClick={logout} >
+            <button className="logout-btn" onClick={handleLogout} >
                 <FaSignOutAlt />
                 Logout
             </button>

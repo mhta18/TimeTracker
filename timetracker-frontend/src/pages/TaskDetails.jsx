@@ -30,9 +30,6 @@ export default function TaskDetails() {
             <div className="task-details-card">
                 <div className="task-details-header">
                     <h2>{task.title}</h2>
-                    <span className={`priority-badge ${task.priority?.toLowerCase()}`}>
-                        {task.priority || "Medium"}
-                    </span>
                 </div>
 
                 <div className="task-details-body">

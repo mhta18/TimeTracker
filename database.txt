@@ -44,7 +44,6 @@ CREATE TABLE tasks (
     created_by INTEGER NOT NULL REFERENCES users(id),
     title VARCHAR(100) NOT NULL,
     description TEXT,
-    priority VARCHAR(20) DEFAULT 'Medium',
     status VARCHAR(20) DEFAULT 'Pending',
     due_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

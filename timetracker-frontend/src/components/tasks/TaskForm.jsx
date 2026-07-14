@@ -18,8 +18,7 @@ export default function TaskForm({
         assigned_to: "",
         title: "",
         description: "",
-        priority: "Medium",
-        status: "Pending",
+        status: "To_Do",
         due_date: ""
     });
 
@@ -40,8 +39,7 @@ export default function TaskForm({
             assigned_to: initialValues.assigned_to || "",
             title: initialValues.title || "",
             description: initialValues.description || "",
-            priority: initialValues.priority || "Medium",
-            status: initialValues.status || "Pending",
+            status: initialValues.status || "To_Do",
             due_date: initialValues.due_date
                 ? initialValues.due_date.substring(0, 10)
                 : ""
@@ -226,32 +224,6 @@ export default function TaskForm({
                                 value={formData.description}
                                 onChange={handleChange}
                             />
-
-                        </label>
-
-                        <label>
-
-                            Priority
-
-                            <select
-                                name="priority"
-                                value={formData.priority}
-                                onChange={handleChange}
-                            >
-
-                                <option value="Low">
-                                    Low
-                                </option>
-
-                                <option value="Medium">
-                                    Medium
-                                </option>
-
-                                <option value="High">
-                                    High
-                                </option>
-
-                            </select>
 
                         </label>
 

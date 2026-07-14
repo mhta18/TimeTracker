@@ -4,9 +4,6 @@ const controller = require("./controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const supervisorMiddleware = require("../../middlewares/supervisorMiddleware");
 
-router.get("/", authMiddleware, controller.getTasks);
-
-router.get("/:id", authMiddleware, controller.getTaskById);
 
 // for supervisor to create tasks for their team members
 router.post(
@@ -17,6 +14,11 @@ router.post(
 );
 
 router.put("/:id", supervisorMiddleware, controller.updateTask);
+
+//
+router.get("/", authMiddleware, controller.getTasks);
+
+router.get("/:id", authMiddleware, controller.getTaskById);
 
 router.delete("/:id",supervisorMiddleware, controller.deleteTask);
 

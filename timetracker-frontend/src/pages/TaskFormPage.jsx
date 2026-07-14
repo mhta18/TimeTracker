@@ -46,13 +46,13 @@ export default function TaskFormPage({ mode = "full" }) {
     }
 
     async function handleSubmit(formData) {
-
+  
         try {
 
             if (!isEdit) {
 
                 await api.post(
-                    "/tasks",
+                    "/tasks/create",
                     formData
                 );
 

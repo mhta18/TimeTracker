@@ -110,16 +110,17 @@ async function updateTeam(req, res) {
         const {
             name,
             description,
-            supervisor_id
+            supervisor_id,
+            member_ids
         } = req.body;
 
-        const team =
-            await teamService.updateTeam(
-                req.params.id,
-                name,
-                description,
-                supervisor_id
-            );
+        const team = await teamService.updateTeam(
+            req.params.id,
+            name,
+            description,
+            supervisor_id,
+            member_ids
+        );
 
         if (!team) {
 

@@ -33,7 +33,7 @@ function Dashboard() {
             setTasks(tasksRes.data);
 
             const running = tasksRes.data.find(
-                (task) => task.status === "In Progress"
+                (task) => task.status === "In_Progress"
             );
 
             setRunningTask(running || null);
@@ -90,7 +90,7 @@ function Dashboard() {
 
                 </div>
 
-                <div className="dashboard-right">
+                <div>
 
                     <RecentTasks
                         tasks={tasks.slice(0, 5)}

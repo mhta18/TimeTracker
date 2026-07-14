@@ -29,29 +29,6 @@
     color: #1e293b;
 }
 
-.priority-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.priority-badge.high {
-    background: #fee2e2;
-    color: #ef4444;
-}
-
-.priority-badge.medium {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.priority-badge.low {
-    background: #dcfce7;
-    color: #22c55e;
-}
-
 .detail-group {
     margin-bottom: 20px;
 }

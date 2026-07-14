@@ -24,8 +24,6 @@ export default function TasksTable({
 
                     <th>Status</th>
 
-                    <th>Priority</th>
-
                     <th>Due Date</th>
 
                     <th>Actions</th>
