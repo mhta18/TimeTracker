@@ -55,6 +55,8 @@ export default function Timer() {
         try {
             if (action === "start") {
                 await api.post(`/timeEntries/task/${taskId}/start`);
+            } else if (action === "stop") {
+                await api.patch(`/timeEntries/task/${taskId}/stop`);
             } else {
                 await api.patch(`/timeEntries/task/${taskId}/${action}`);
             }

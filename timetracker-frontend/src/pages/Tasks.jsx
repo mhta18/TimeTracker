@@ -11,12 +11,25 @@ export default function Tasks() {
     const navigate = useNavigate();
 
     const [tasks, setTasks] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        loadUser();
+        loadTasks();
+    }, []);
+
+ 
 
     useEffect(() => {
 
         loadTasks();
 
     }, []);
+
+    async function loadUser() {
+        const response = await api.get("/auth/me");
+        setUser(response.data);
+    }
 
     async function loadTasks() {
 
@@ -75,7 +88,7 @@ export default function Tasks() {
             <TasksTable
 
                 tasks={tasks}
-
+                user={user}
                 onDelete={handleDelete}
 
             />

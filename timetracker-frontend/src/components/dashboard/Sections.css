@@ -4,11 +4,19 @@
 
     border-radius: 12px;
     height: 200px;
+    color: black;
 
     padding: 25px;
 
     box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
 
+}
+.card h2{
+    color: black;
+}
+
+.card h3{
+    font-size: 20px;
 }
 .taskCard{
     padding: 30px;

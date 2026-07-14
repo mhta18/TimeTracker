@@ -6,7 +6,8 @@ import "./TaskForm.css";
 export default function TaskForm({
     initialValues,
     onSubmit,
-    submitText
+    submitText,
+    statusOnly = false
 }) {
 
     const [projects, setProjects] = useState([]);
@@ -22,22 +23,25 @@ export default function TaskForm({
         due_date: ""
     });
 
-
     useEffect(() => {
-        loadProjects();
-    }, []);
+
+        if (!statusOnly) {
+            loadProjects();
+        }
+
+    }, [statusOnly]);
 
     useEffect(() => {
 
         if (!initialValues) return;
 
         setFormData({
-            project_id: initialValues.project_id,
-            assigned_to: initialValues.assigned_to,
-            title: initialValues.title,
-            description: initialValues.description,
-            priority: initialValues.priority,
-            status: initialValues.status,
+            project_id: initialValues.project_id || "",
+            assigned_to: initialValues.assigned_to || "",
+            title: initialValues.title || "",
+            description: initialValues.description || "",
+            priority: initialValues.priority || "Medium",
+            status: initialValues.status || "Pending",
             due_date: initialValues.due_date
                 ? initialValues.due_date.substring(0, 10)
                 : ""
@@ -45,8 +49,9 @@ export default function TaskForm({
 
     }, [initialValues]);
 
-
     useEffect(() => {
+
+        if (statusOnly) return;
 
         if (!formData.project_id) {
 
@@ -57,7 +62,7 @@ export default function TaskForm({
 
         loadMembers(formData.project_id);
 
-    }, [formData.project_id]);
+    }, [formData.project_id, statusOnly]);
 
     async function loadProjects() {
 
@@ -67,9 +72,7 @@ export default function TaskForm({
 
             setProjects(response.data);
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(error);
 
@@ -87,9 +90,7 @@ export default function TaskForm({
 
             setMembers(response.data);
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(error);
 
@@ -100,7 +101,6 @@ export default function TaskForm({
     function handleChange(e) {
 
         const { name, value } = e.target;
-
 
         if (name === "project_id") {
 
@@ -121,7 +121,7 @@ export default function TaskForm({
 
     }
 
-    function handleFormSubmit(e) {
+    function handleSubmit(e) {
 
         e.preventDefault();
 
@@ -130,113 +130,147 @@ export default function TaskForm({
     }
 
     return (
+
         <div className="form-container">
+
             <form
                 className="task-form"
-                onSubmit={handleFormSubmit}
+                onSubmit={handleSubmit}
             >
 
-                <label>
-                    Project
-                    <select
-                        name="project_id"
-                        value={formData.project_id}
-                        onChange={handleChange}
-                        required
-                    >
+                {!statusOnly && (
 
-                        <option value="">
-                            Select Project
-                        </option>
+                    <>
 
-                        {projects.map(project => (
+                        <label>
 
-                            <option
-                                key={project.id}
-                                value={project.id}
+                            Project
+
+                            <select
+                                name="project_id"
+                                value={formData.project_id}
+                                onChange={handleChange}
+                                required
                             >
-                                {project.name}
-                            </option>
 
-                        ))}
+                                <option value="">
+                                    Select Project
+                                </option>
 
-                    </select>
+                                {projects.map(project => (
 
-                </label>
+                                    <option
+                                        key={project.id}
+                                        value={project.id}
+                                    >
+                                        {project.name}
+                                    </option>
 
-                <label>
-                    Assign To
+                                ))}
 
-                    <select
-                        name="assigned_to"
-                        value={formData.assigned_to}
-                        onChange={handleChange}
-                        required
-                    >
+                            </select>
 
-                        <option value="">
-                            Select Member
-                        </option>
+                        </label>
 
-                        {members.map(member => (
+                        <label>
 
-                            <option
-                                key={member.id}
-                                value={member.id}
+                            Assign To
+
+                            <select
+                                name="assigned_to"
+                                value={formData.assigned_to}
+                                onChange={handleChange}
+                                required
                             >
-                                {member.username}
-                            </option>
 
-                        ))}
+                                <option value="">
+                                    Select Member
+                                </option>
 
-                    </select>
+                                {members.map(member => (
 
-                </label>
+                                    <option
+                                        key={member.id}
+                                        value={member.id}
+                                    >
+                                        {member.username}
+                                    </option>
 
-                <label>
+                                ))}
 
-                    Title
+                            </select>
 
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                    />
+                        </label>
 
-                </label>
+                        <label>
 
-                <label>
+                            Title
 
-                    Description
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                            />
 
-                    <textarea
-                        name="description"
-                        rows="5"
-                        value={formData.description}
-                        onChange={handleChange}
-                    />
+                        </label>
 
-                </label>
+                        <label>
 
-                <label>
+                            Description
 
-                    Priority
+                            <textarea
+                                rows="5"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                            />
 
-                    <select
-                        name="priority"
-                        value={formData.priority}
-                        onChange={handleChange}
-                    >
+                        </label>
 
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
+                        <label>
 
-                    </select>
+                            Priority
 
-                </label>
+                            <select
+                                name="priority"
+                                value={formData.priority}
+                                onChange={handleChange}
+                            >
+
+                                <option value="Low">
+                                    Low
+                                </option>
+
+                                <option value="Medium">
+                                    Medium
+                                </option>
+
+                                <option value="High">
+                                    High
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                        <label>
+
+                            Due Date
+
+                            <input
+                                type="date"
+                                name="due_date"
+                                value={formData.due_date}
+                                onChange={handleChange}
+                            />
+
+                        </label>
+
+                    </>
+
+                )}
 
                 <label>
 
@@ -248,24 +282,19 @@ export default function TaskForm({
                         onChange={handleChange}
                     >
 
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
+                        <option value="To_Do">
+                            To_Do
+                        </option>
+
+                        <option value="In_Progress">
+                            In_Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
 
                     </select>
-
-                </label>
-
-                <label>
-
-                    Due Date
-
-                    <input
-                        type="date"
-                        name="due_date"
-                        value={formData.due_date}
-                        onChange={handleChange}
-                    />
 
                 </label>
 
@@ -277,6 +306,7 @@ export default function TaskForm({
                 </button>
 
             </form>
+
         </div>
 
     );

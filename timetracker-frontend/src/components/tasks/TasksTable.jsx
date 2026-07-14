@@ -5,7 +5,7 @@ import TaskRow from "./TaskRow";
 export default function TasksTable({
 
     tasks,
-
+    user,
     onDelete
 
 }) {
@@ -43,6 +43,8 @@ export default function TasksTable({
                         key={task.id}
 
                         task={task}
+
+                        user={user}
 
                         onDelete={onDelete}
 

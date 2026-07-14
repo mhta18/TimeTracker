@@ -15,6 +15,7 @@ import TaskFormPage from './pages/TaskFormPage';
 import Teams from './pages/Teams';
 import TeamPage from './pages/TeamPage';
 import Timer from './pages/Timer';
+import TaskDetails from './pages/TaskDetails';
 import './App.css'
 
 function App() {
@@ -68,10 +69,17 @@ function App() {
           />
 
           <Route
+            path="/tasks/:id/view"
+            element={<TaskDetails />}
+          />
+
+          <Route
             path="/tasks/:id/edit"
             element={<TaskFormPage />}
           />
 
+          <Route path="/tasks/:id/status" element={<TaskFormPage mode="status" />} />
+          
           <Route
             path="/teams"
             element={<Teams />}

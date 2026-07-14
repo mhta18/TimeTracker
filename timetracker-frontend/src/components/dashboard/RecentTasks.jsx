@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../dashboard/Sections.css";
 function RecentTasks({ tasks }) {
 
@@ -16,7 +17,9 @@ function RecentTasks({ tasks }) {
                         className="taskCard"
                     >
 
-                        <h3>{task.title}</h3>
+                        <Link to={`/tasks/${task.id}/view`}>
+                            {task.title}
+                        </Link>
 
                         <p>{task.status}</p>
 

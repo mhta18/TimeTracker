@@ -9,12 +9,18 @@ import "./Projects.css";
 export default function Projects() {
 
     const [projects, setProjects] = useState([]);
-
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         loadProjects();
+        loadUser();
     }, []);
+
+    async function loadUser() {
+        const response = await api.get("/auth/me");
+        setUser(response.data);
+    }
 
     async function loadProjects() {
 
@@ -68,6 +74,7 @@ export default function Projects() {
 
             <ProjectTable
                 projects={projects}
+                user={user}
                 onDelete={handleDelete}
             />
 

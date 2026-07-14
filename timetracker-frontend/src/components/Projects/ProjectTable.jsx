@@ -5,7 +5,7 @@ import "./ProjectTable.css";
 export default function ProjectTable({
 
     projects,
-
+    user,
     onDelete
 
 }) {
@@ -41,6 +41,8 @@ export default function ProjectTable({
                         key={project.id}
 
                         project={project}
+
+                        user={user}
 
                         onDelete={onDelete}
 

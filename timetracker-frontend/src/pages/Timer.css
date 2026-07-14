@@ -45,12 +45,12 @@
 }
 
 .btn-start {
-    background-color: #10b981;
+    background-color: #29af77;
     color: white;
 }
 
 .btn-pause {
-    background-color: #f59e0b;
+    background-color: #d4a149;
     color: white;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .btn-stop {
-    background-color: #ef4444;
+    background-color: #c94545;
     color: white;
 }
 
@@ -84,7 +84,9 @@
     background-color: #f8fafc;
     color: #64748b;
 }
-
+.card-header h2{
+    color: #1e293b;
+}
 .action-timer {
 
     display: flex;
@@ -114,7 +116,7 @@
 
     cursor: pointer;
 
-    color: #db5252;
+    color: #e66868;
 
 
 }

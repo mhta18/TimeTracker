@@ -1,17 +1,17 @@
+import { NavLink } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {
-    FaHome,
+    FaTachometerAlt,
     FaFolder,
     FaTasks,
     FaUsers,
     FaClock,
-    FaHistory,
     FaSignOutAlt
 } from "react-icons/fa";
 
-import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
-export default function Sidebar() {
+export default function Sidebar({ user }) {
 
     const navigate = useNavigate();
 
@@ -20,36 +20,42 @@ export default function Sidebar() {
         navigate("/login");
     }
 
+
     return (
 
         <aside className="sidebar">
 
-            <h2 className="sidebar-logo">
-                <FaClock />
+            <div className="sidebar-logo">
                 TimeTracker
-            </h2>
+            </div>
 
             <nav>
 
                 <NavLink to="/dashboard">
-                    <FaHome />
+                    <FaTachometerAlt />
                     Dashboard
                 </NavLink>
 
-                <NavLink to="/projects">
-                    <FaFolder />
-                    Projects
-                </NavLink>
+                {user?.role !== "member" && (
+                    <>
+                        <NavLink to="/projects">
+                            <FaFolder />
+                            Projects
+                        </NavLink>
+                    </>
+                )}
 
                 <NavLink to="/tasks">
                     <FaTasks />
                     Tasks
                 </NavLink>
 
-                <NavLink to="/teams">
-                    <FaUsers />
-                    Teams
-                </NavLink>
+                {user?.role === "admin" && (
+                    <NavLink to="/teams">
+                        <FaUsers />
+                        Teams
+                    </NavLink>
+                )}
 
                 <NavLink to="/timer">
                     <FaClock />
@@ -58,10 +64,7 @@ export default function Sidebar() {
 
             </nav>
 
-            <button
-                className="logout-btn"
-                onClick={logout}
-            >
+            <button className="logout-btn" onClick={logout} >
                 <FaSignOutAlt />
                 Logout
             </button>
@@ -69,4 +72,5 @@ export default function Sidebar() {
         </aside>
 
     );
+
 }

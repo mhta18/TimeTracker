@@ -8,7 +8,7 @@ function QuickActions() {
 
         <div className="card">
 
-            <h3>Quick Actions</h3>
+            <h2>Quick Actions</h2>
             <br />
             <Link to="/projects/create">
                 Create Project

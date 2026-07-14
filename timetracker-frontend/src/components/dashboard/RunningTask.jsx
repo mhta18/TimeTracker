@@ -6,7 +6,7 @@ function RunningTask({ task }) {
 
         <div className="card">
 
-            <h3>Running Task</h3>
+            <h2>Running Task</h2>
             <br />
             {
 

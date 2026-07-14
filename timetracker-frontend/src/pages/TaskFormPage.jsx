@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
-
 import {
-
     useNavigate,
-
     useParams
-
 } from "react-router-dom";
 
 import api from "../api/api";
-
 import TaskForm from "../components/tasks/TaskForm";
 
-import Button from "../components/common/button";
-
-export default function TaskFormPage() {
+export default function TaskFormPage({ mode = "full" }) {
 
     const { id } = useParams();
 
@@ -22,17 +15,17 @@ export default function TaskFormPage() {
 
     const isEdit = Boolean(id);
 
-    const [task, setTask] = useState();
+    const isStatusOnly = mode === "status";
+
+    const [task, setTask] = useState(null);
 
     useEffect(() => {
 
         if (isEdit) {
-
             loadTask();
-
         }
 
-    }, []);
+    }, [id]);
 
     async function loadTask() {
 
@@ -56,26 +49,31 @@ export default function TaskFormPage() {
 
         try {
 
-            if (isEdit) {
+            if (!isEdit) {
 
-                await api.put(
-
-                    `/tasks/${id}`,
-
+                await api.post(
+                    "/tasks",
                     formData
+                );
 
+            }
+
+            else if (isStatusOnly) {
+
+                await api.patch(
+                    `/tasks/${id}/status`,
+                    {
+                        status: formData.status
+                    }
                 );
 
             }
 
             else {
 
-                await api.post(
-
-                    "/tasks",
-
+                await api.put(
+                    `/tasks/${id}`,
                     formData
-
                 );
 
             }
@@ -96,34 +94,30 @@ export default function TaskFormPage() {
 
         <div className="page-card">
 
-
             <h1>
 
-                {
-
-                    isEdit
-
-                        ? "Edit Task"
-
-                        : "Create Task"
-
-                }
+                {!isEdit
+                    ? "Create Task"
+                    : isStatusOnly
+                        ? "Update Task Status"
+                        : "Edit Task"}
 
             </h1>
 
             <TaskForm
+
                 initialValues={task}
+
+                statusOnly={isStatusOnly}
 
                 onSubmit={handleSubmit}
 
                 submitText={
-
-                    isEdit
-
-                        ? "Update Task"
-
-                        : "Create Task"
-
+                    !isEdit
+                        ? "Create Task"
+                        : isStatusOnly
+                            ? "Update Status"
+                            : "Update Task"
                 }
 
             />

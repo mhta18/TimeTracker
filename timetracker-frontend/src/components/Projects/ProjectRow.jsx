@@ -13,10 +13,11 @@ import {
 export default function ProjectRow({
 
     project,
-
+    user,
     onDelete
 
 }) {
+
 
     return (
 
@@ -49,19 +50,20 @@ export default function ProjectRow({
                     <FaEye />
 
                 </Link>
+                {user?.role !== "supervisor" && (
+                    <Link to={`/projects/${project.id}/edit`}>
 
-                <Link to={`/projects/${project.id}/edit`}>
+                        <FaEdit />
 
-                    <FaEdit />
-
-                </Link>
-
-                <button
-                    onClick={() => onDelete(project.id)}
-                >
-                    <FaTrash />
-                </button>
-
+                    </Link>
+                )}
+                {user?.role !== "supervisor" && (
+                    <button
+                        onClick={() => onDelete(project.id)}
+                    >
+                        <FaTrash />
+                    </button>
+                )}
             </td>
 
         </tr>
