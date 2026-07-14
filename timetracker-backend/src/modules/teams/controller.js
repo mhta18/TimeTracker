@@ -4,11 +4,12 @@ async function createTeam(req, res) {
 
     try {
 
-        const { name, supervisor_id } = req.body;
+        const { name,description,supervisor_id } = req.body;
 
         const team =
             await teamService.createTeam(
                 name,
+                description,
                 supervisor_id
             );
 
@@ -22,6 +23,19 @@ async function createTeam(req, res) {
 
     }
 
+}
+
+async function getTeamMembers(req, res) {
+    try {
+        const teamId = req.params.id
+        const memebers = teamService.getTeamMembers(teamId);
+        res.json(memebers);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+    
 }
 
 async function getTeams(req, res) {
@@ -72,12 +86,35 @@ async function getTeamById(req, res) {
 
 }
 
+async function getSupervisors(req, res) {
+
+    try {
+
+        const supervisors = await userService.getSupervisors();
+
+        res.json(supervisors);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+}
+
 async function updateTeam(req, res) {
 
     try {
 
         const {
             name,
+            description,
             supervisor_id
         } = req.body;
 
@@ -85,6 +122,7 @@ async function updateTeam(req, res) {
             await teamService.updateTeam(
                 req.params.id,
                 name,
+                description,
                 supervisor_id
             );
 
@@ -163,8 +201,6 @@ async function addMember(req, res) {
 
         }
 
-
-        // Check user exists
         const user =
             await teamService.checkUserExists(
                 user_id
@@ -177,9 +213,6 @@ async function addMember(req, res) {
             });
 
         }
-
-
-        // Already in team?
         const exists =
             await teamService.memberExists(
                 teamId,
@@ -222,8 +255,6 @@ async function removeMember(req, res) {
         const supervisorId = req.session.user.id;
         const userId = req.params.userId;
 
-
-        // Ownership
         const team =
             await teamService.checkSupervisorOwnsTeam(
                 teamId,
@@ -274,5 +305,6 @@ module.exports = {
     updateTeam,
     deleteTeam,
     addMember,
-    removeMember
+    removeMember,
+    getTeamMembers
 };

@@ -5,25 +5,25 @@ const controller = require("./controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 
 router.post(
-    "/start/:taskId",
+    "/task/:taskId/start",
     authMiddleware,
     controller.startTimer
 );
 
 router.patch(
-    "/pause/:taskId",
+    "/task/:taskId/pause",
     authMiddleware,
     controller.pauseTimer
 );
 
 router.patch(
-    "/resume/:taskId",
+    "/task/:taskId/resume",
     authMiddleware,
     controller.resumeTimer
 );
 
 router.patch(
-    "/stop/:taskId",
+    "/task/:taskId/stop",
     authMiddleware,
     controller.stopTimer
 );
@@ -35,9 +35,13 @@ router.get(
 );
 
 router.get(
-    "/:id",
+    "/:id/current",
     authMiddleware,
     controller.getTimeEntryById
 );
+
+router.delete('/:id',authMiddleware,controller.deleteTimeEntry);
+
+router.get('/current', authMiddleware, controller.getCurrentTimer);
 
 module.exports = router;

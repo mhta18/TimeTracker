@@ -15,11 +15,24 @@ function handleError(res, error) {
     });
 }
 
+async function getProjectTasks(req, res) {
+    try {
+        const role = req.session.user.role;
+        const userId = req.session.user.id;
+        const projectId = req.params.id;
+        const tasks = await projectService.getProjectTasks(role, userId, projectId);
+        res.json(tasks);
+    } catch (error) {
+        return handleError(res, error);
+    }
+
+}
+
 async function createProject(req, res) {
 
     try {
 
-        const {team_id, name, description, status } = req.body;
+        const { team_id, name, description, status } = req.body;
 
         const project = await projectService.createProject(
             team_id,
@@ -52,7 +65,8 @@ async function getProjectById(req, res) {
         const role = req.session.user.role;
         const userId = req.session.user.id;
         const projectId = req.params.id;
-        const project = await projectService.getProjectById(role, userId, projectId);
+
+        const project = await projectService.getProjectById(projectId);
 
         res.json(project);
 
@@ -62,10 +76,31 @@ async function getProjectById(req, res) {
     }
 }
 
+async function getTaskTeamMembers(req, res) {
+
+    try {
+
+        const projectId = req.params.id;
+        const members = await projectService.getTaskTeamMembers(projectId);
+
+        res.json(members);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+}
+
 async function updateProject(req, res) {
     try {
         const projectId = req.params.id;
-        const {team_id, name, description, status } = req.body;
+        const { team_id, name, description, status } = req.body;
         const updatedProject = await projectService.updateProject(
             projectId,
             req.session.user.role,
@@ -78,7 +113,7 @@ async function updateProject(req, res) {
     }
     catch (error) {
         return handleError(res, error);
-    }   
+    }
 }
 
 async function deleteProject(req, res) {
@@ -97,5 +132,7 @@ module.exports = {
     getProjects,
     getProjectById,
     updateProject,
-    deleteProject
+    deleteProject,
+    getProjectTasks,
+    getTaskTeamMembers
 };

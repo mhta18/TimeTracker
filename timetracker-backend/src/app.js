@@ -10,23 +10,37 @@ const teamRoutes = require("./modules/teams/routes");
 
 const app = express()
 
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true
+    })
+);
+
 app.use(express.json());
 
-app.use(session({
-    secret: "your-secret-key",
-    resave: false,
-    saveUninitialized: false
-}));
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+
+        cookie: {
+            secure: false
+        }
+    })
+);
 
 app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
-app.use("/api/timeentries", timeEntryRoutes);
+app.use("/api/timeEntries", timeEntryRoutes);
 app.use("/api/teams", teamRoutes);
 
 app.get("/", (req, res) => {
     res.json({ message: "TimeTracker API running" });
 });
+
+
 
 module.exports = app;

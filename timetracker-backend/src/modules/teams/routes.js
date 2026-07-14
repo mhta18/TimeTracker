@@ -7,50 +7,44 @@ const supervisorMiddleware = require("../../middlewares/supervisorMiddleware");
 const controller = require("./controller");
 router.get(
     "/:id",
-    authMiddleware,
     adminMiddleware,
     controller.getTeamById
 );
 
 router.get(
     "/",
-    authMiddleware,
     adminMiddleware,
     controller.getTeams
 );
 
 router.post(
-    "/",
-    authMiddleware,
+    "/create",
     adminMiddleware,
     controller.createTeam
 );
 
 router.put(
     "/:id",
-    authMiddleware,
     adminMiddleware,
     controller.updateTeam
 );
 
 router.delete(
     "/:id",
-    authMiddleware,
     adminMiddleware,
     controller.deleteTeam
 );
 
-// for supervisors to add/remove members from their teams
+// for supervisors to add/remove/get members from their teams
+router.get("/:id/members",supervisorMiddleware,controller.getTeamMembers);//?
 router.post(
     "/:id/members",
-    authMiddleware,
     supervisorMiddleware,
     controller.addMember
 );
 
 router.delete(
     "/:id/members/:userId",
-    authMiddleware,
     supervisorMiddleware,
     controller.removeMember
 );

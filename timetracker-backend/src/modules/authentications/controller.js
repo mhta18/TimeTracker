@@ -1,8 +1,18 @@
 const authService = require("./service");
 
+async function getCurrentUser(req, res) {
+
+    res.json({
+        id: req.session.user.id,
+        username: req.session.user.username,
+        role: req.session.user.role
+    });
+
+}
+
 async function register(req, res) {
     try {
-        const { username, password,role } = req.body;
+        const { username, password, role } = req.body;
 
         const existingUser =
             await authService.findUserByUsername(username);
@@ -72,8 +82,33 @@ function logout(req, res) {
     });
 }
 
+async function getSupervisors(req, res) {
+
+    try {
+
+        const supervisors = await authService.getSupervisors();
+
+        res.json(supervisors);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+}
+
+
 module.exports = {
     register,
     login,
-    logout
+    logout,
+    getCurrentUser,
+    getSupervisors
 };

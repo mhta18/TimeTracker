@@ -10,15 +10,15 @@ router.get("/:id", authMiddleware, controller.getTaskById);
 
 // for supervisor to create tasks for their team members
 router.post(
-    "/",
+    "/create",
     authMiddleware,
     supervisorMiddleware,
     controller.createTask
 );
 
-router.put("/:id", authMiddleware, supervisorMiddleware, controller.updateTask);
+router.put("/:id", supervisorMiddleware, controller.updateTask);
 
-router.delete("/:id", authMiddleware, supervisorMiddleware, controller.deleteTask);
+router.delete("/:id",supervisorMiddleware, controller.deleteTask);
 
 // only memebers of the team can update the status of their tasks
 router.patch(

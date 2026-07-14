@@ -21,7 +21,27 @@ async function createUser(username, password,role) {
     return result.rows[0];
 }
 
+async function getSupervisors() {
+
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            username
+        FROM users
+        WHERE role='supervisor'
+        ORDER BY username;
+        `
+    );
+
+    return result.rows;
+
+}
+
+
+
 module.exports = {
     findUserByUsername,
-    createUser,
+    getSupervisors,
+    createUser
 };

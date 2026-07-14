@@ -98,38 +98,45 @@ async function createTask(
 async function getTasks(userId, role) {
 
     let query;
-    let values = [];
+    let values;
 
     if (role === "admin") {
 
         query = `
-            SELECT *
-            FROM tasks
-            ORDER BY id DESC
+            SELECT
+                t.*,
+                p.name AS project_name
+            FROM tasks t
+            JOIN projects p
+                ON t.project_id = p.id
         `;
 
-    }
+        values = [];
 
-    else if (role === "supervisor") {
+    } else if (role === "supervisor") {
 
         query = `
-            SELECT *
-            FROM tasks
-            WHERE created_by=$1
-            ORDER BY id DESC
+            SELECT
+                t.*,
+                p.name AS project_name
+            FROM tasks t
+            JOIN projects p
+                ON t.project_id = p.id
+            WHERE t.created_by = $1
         `;
 
         values = [userId];
 
-    }
-
-    else {
+    } else {
 
         query = `
-            SELECT *
-            FROM tasks
-            WHERE assigned_to=$1
-            ORDER BY id DESC
+            SELECT
+                t.*,
+                p.name AS project_name
+            FROM tasks t
+            JOIN projects p
+                ON t.project_id = p.id
+            WHERE t.assigned_to = $1
         `;
 
         values = [userId];
@@ -139,7 +146,6 @@ async function getTasks(userId, role) {
     const result = await pool.query(query, values);
 
     return result.rows;
-
 }
 
 async function getTaskById(id, userId, role) {
@@ -150,28 +156,31 @@ async function getTaskById(id, userId, role) {
     if (role === "admin") {
 
         query = `
-            SELECT *
+            SELECT
+                tasks.*,
+                p.name AS project_name
             FROM tasks
-            WHERE id=$1
+            JOIN projects p
+                ON tasks.project_id = p.id
+            WHERE tasks.id = $1;
         `;
 
         values = [id];
 
-    }
-
-    else {
+    } else {
 
         query = `
-            SELECT *
+            SELECT
+                tasks.*,
+                p.name AS project_name
             FROM tasks
-
-            WHERE id=$1
-
-            AND
-            (
-                created_by=$2
-                OR assigned_to=$2
-            )
+            JOIN projects p
+                ON tasks.project_id = p.id
+            WHERE tasks.id = $1
+              AND (
+                    tasks.created_by = $2
+                    OR tasks.assigned_to = $2
+                  );
         `;
 
         values = [id, userId];
@@ -190,6 +199,7 @@ async function getTaskById(id, userId, role) {
     return result.rows[0];
 
 }
+
 
 async function updateTask(
     id,

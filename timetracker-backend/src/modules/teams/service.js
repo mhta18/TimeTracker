@@ -1,27 +1,41 @@
 const pool = require("../../config/db");
 
-
-// =========================
-// Admin
-// =========================
-
-async function createTeam(name, supervisorId) {
+async function createTeam(name, description, supervisorId) {
 
     const result = await pool.query(
         `
         INSERT INTO teams
-        (name, supervisor_id)
+        (name, description, supervisor_id)
 
-        VALUES($1,$2)
+        VALUES($1,$2,$3)
 
         RETURNING *;
         `,
-        [name, supervisorId]
+        [name, description, supervisorId]
     );
 
     return result.rows[0];
 }
 
+async function getTeamMembers(teamId) {
+    const result = await pool.query(
+        `
+        SELECT
+            u.id,
+            u.username,
+        FROM team_members tm
+        JOIN users u
+            ON tm.user_id = u.id
+
+        WHERE tm.team_id = $1
+
+        ORDER BY u.username;
+        `,
+        [teamId]
+    );
+
+    return result.rows;
+}
 
 async function getTeams() {
 
@@ -64,8 +78,25 @@ async function getTeamById(id) {
     return result.rows[0];
 }
 
+async function getSupervisors() {
 
-async function updateTeam(id, name, supervisorId) {
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            username
+        FROM users
+        WHERE role='supervisor'
+        ORDER BY username;
+        `
+    );
+
+    return result.rows;
+
+}
+
+
+async function updateTeam(id, name, description, supervisorId) {
 
     const result = await pool.query(
         `
@@ -73,14 +104,16 @@ async function updateTeam(id, name, supervisorId) {
 
         SET
             name = $1,
-            supervisor_id = $2
+            description = $2,
+            supervisor_id = $3
 
-        WHERE id = $3
+        WHERE id = $4
 
         RETURNING *;
         `,
         [
             name,
+            description,
             supervisorId,
             id
         ]
@@ -105,11 +138,6 @@ async function deleteTeam(id) {
 
     return result.rows[0];
 }
-
-
-// =========================
-// Supervisor
-// =========================
 
 
 // Verify supervisor owns the team
@@ -226,11 +254,11 @@ module.exports = {
     getTeamById,
     updateTeam,
     deleteTeam,
-
     checkSupervisorOwnsTeam,
     checkUserExists,
     memberExists,
     addMember,
-    removeMember
+    removeMember,
+    getTeamMembers
 
 };

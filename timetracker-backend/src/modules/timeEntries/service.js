@@ -15,19 +15,25 @@ async function checkTaskOwnership(taskId, userId) {
     return result.rows[0];
 }
 
-async function checkRunningTimer(taskId) {
+async function getActiveTimer(userId) {
+    const query = `
+        SELECT 
+            te.id,
+            te.task_id,
+            te.status,
+            te.start_time,
+            t.title AS task_title,
+            p.name AS project_name
+        FROM time_entries te
+        JOIN tasks t ON te.task_id = t.id
+        LEFT JOIN projects p ON t.project_id = p.id
+        WHERE t.assigned_to = $1 AND te.status = 'running'
+        LIMIT 1;
+    `;
 
-    const result = await pool.query(
-        `
-        SELECT *
-        FROM time_entries
-        WHERE task_id = $1
-        AND status = 'running';
-        `,
-        [taskId]
-    );
+    const result = await pool.query(query, [userId]);
 
-    return result.rows[0];
+    return result.rows[0] || null;
 }
 
 async function checkPausedTimer(taskId) {
@@ -38,6 +44,21 @@ async function checkPausedTimer(taskId) {
         FROM time_entries
         WHERE task_id = $1
         AND status = 'paused';
+        `,
+        [taskId]
+    );
+
+    return result.rows[0];
+}
+
+async function checkRunningTimer(taskId) {
+
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM time_entries
+        WHERE task_id = $1
+        AND status='running'
         `,
         [taskId]
     );
@@ -152,43 +173,50 @@ async function resumeTimer(taskId, userId) {
     return result.rows[0];
 }
 
+async function checkActiveTimer(taskId) {
+    const result = await pool.query(
+        `SELECT * FROM time_entries 
+         WHERE task_id = $1 AND status IN ('running', 'paused') AND end_time IS NULL 
+         LIMIT 1;`,
+        [taskId]
+    );
+    return result.rows[0];
+}
+
 async function stopTimer(taskId, userId) {
-
     const task = await checkTaskOwnership(taskId, userId);
-
     if (!task) {
         throw { status: 403, message: "Access denied." };
     }
-
-    const timer = await checkRunningTimer(taskId);
-
+    const timer = await checkActiveTimer(taskId);
     if (!timer) {
-        throw { status: 400, message: "No running timer found." };
+        throw { status: 400, message: "No active or paused timer found to stop." };
     }
 
-    const result = await pool.query(
-        `
-        UPDATE time_entries
+    let query;
+    if (timer.status === 'running') {
+        query = `
+            UPDATE time_entries
+            SET
+                total_duration = total_duration + EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - last_started_at)),
+                end_time = CURRENT_TIMESTAMP,
+                last_started_at = NULL,
+                status = 'stopped'
+            WHERE id = $1
+            RETURNING *;
+        `;
+    } else {
+        query = `
+            UPDATE time_entries
+            SET
+                end_time = CURRENT_TIMESTAMP,
+                status = 'stopped'
+            WHERE id = $1
+            RETURNING *;
+        `;
+    }
 
-        SET
-
-            total_duration =
-                total_duration +
-                EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - last_started_at)),
-
-            end_time = CURRENT_TIMESTAMP,
-
-            last_started_at = NULL,
-
-            status = 'stopped'
-
-        WHERE id = $1
-
-        RETURNING *;
-        `,
-        [timer.id]
-    );
-
+    const result = await pool.query(query, [timer.id]);
     return result.rows[0];
 }
 
@@ -196,7 +224,9 @@ async function getTimeEntries(userId) {
 
     const result = await pool.query(
         `
-        SELECT te.*
+        SELECT
+        te.*,
+        t.title AS task_title
 
         FROM time_entries te
 
@@ -237,11 +267,27 @@ async function getTimeEntryById(id, userId) {
     return result.rows[0];
 }
 
+async function deleteTimeEntry(entryId, userId) {
+    const query = `
+        DELETE FROM time_entries te
+        USING tasks t
+        WHERE te.task_id = t.id
+          AND te.id = $1
+          AND t.assigned_to = $2
+        RETURNING te.*;
+    `;
+
+    const result = await pool.query(query, [entryId, userId]);
+    return result.rows[0];
+}
+
 module.exports = {
     startTimer,
     pauseTimer,
     resumeTimer,
     stopTimer,
     getTimeEntries,
-    getTimeEntryById
+    getTimeEntryById,
+    getActiveTimer,
+    deleteTimeEntry
 };
