@@ -96,7 +96,6 @@ export default function TaskFormPage() {
 
         <div className="page-card">
 
-            <Button />
 
             <h1>
 

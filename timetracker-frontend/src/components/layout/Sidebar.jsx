@@ -56,11 +56,6 @@ export default function Sidebar() {
                     Timer
                 </NavLink>
 
-                <NavLink to="/history">
-                    <FaHistory />
-                    History
-                </NavLink>
-
             </nav>
 
             <button

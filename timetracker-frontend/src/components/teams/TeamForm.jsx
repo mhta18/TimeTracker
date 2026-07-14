@@ -194,7 +194,7 @@ export default function TeamForm({
 
                         <button
 
-                            className="submit-btn"
+                            className="submit-btn-team"
 
                             type="submit"
 

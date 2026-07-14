@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/api";
 
 import ProjectInfo from "../components/projects/ProjectInfo";
-import ProjectTasksTable from "../components/projects/ProjectTasksTable";
+import TaskTable from "../components/Tasks/TasksTable";
 
 import "./ProjectDetails.css";
 
@@ -62,7 +62,7 @@ export default function ProjectDetails() {
             
             <ProjectInfo project={project}/>
 
-            <ProjectTasksTable tasks={tasks} />
+            < TaskTable tasks={tasks} />
 
         </div>
 

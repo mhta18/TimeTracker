@@ -1,66 +1,81 @@
 .project-table {
 
+
     width: 100%;
 
     border-collapse: collapse;
 
     background: white;
 
-    border-radius: 16px;
+    border-radius: 12px;
 
     overflow: hidden;
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .05);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+
 
 }
 
-.project-table thead {
+
+
+.project-table th {
+
+
+    background: #f8fafc;
+
+    padding: 15px;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    color: #64748b;
+
+    border-bottom: 1px solid #e2e8f0;
+
+
+}
+
+
+
+.project-table td {
+
+
+    padding: 15px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #334155;
+
+
+}
+
+
+
+.project-table tr:hover {
 
     background: #f8fafc;
 
 }
 
-.project-table th {
-
-    text-align: left;
-
-    padding: 18px;
-
-    color: #374151;
-
-}
-
-.project-table td {
-
-    padding: 18px;
-
-    border-top: 1px solid #edf2f7;
-
-}
-
-.project-table tbody tr:hover {
-
-    background: #f9fafb;
-
-}
-
-.actions {
+.actions-project {
 
     display: flex;
 
-    gap: 18px;
+    gap: 15px;
 
     align-items: center;
+  
 
 }
 
-.actions a {
+.actions-project a {
 
     color: #5b4cf0;
 
 }
 
-.actions button {
+.actions-project button {
 
     border: none;
 
@@ -68,7 +83,15 @@
 
     cursor: pointer;
 
-    color: #ef4444;
+    color: #dd4747;
+
+}
+
+.actions-project button:hover,
+.actions-project a:hover {
+
+
+    opacity: .7;
 
 }
 

@@ -48,16 +48,8 @@ export default function TeamRow({
                 }
 
             </td>
-            <td className="actions">
+            <td className="actions-team">
 
-
-                <Link
-                    to={`/teams/${team.id}`}
-                >
-
-                    <FaEye />
-
-                </Link>
                 <Link
                     to={`/teams/${team.id}/edit`}
                 >

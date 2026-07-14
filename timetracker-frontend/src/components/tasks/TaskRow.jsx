@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 
 import {
-
-    FaEye,
     FaEdit,
     FaTrash
 
@@ -44,17 +42,17 @@ export default function TaskRow({
 
             </td>
 
-            <td className="actions">
+            <td className="actions-task">
 
                 <Link
-                    className="edit-btn"
+                    
                     to={`/tasks/${task.id}/edit`}
                 >
                     <FaEdit />
                 </Link>
 
                 <button
-                    className="delete-btn"
+                    
                     onClick={() => onDelete(task.id)}
                 >
                     <FaTrash />

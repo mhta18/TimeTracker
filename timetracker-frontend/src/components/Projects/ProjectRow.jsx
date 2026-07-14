@@ -42,7 +42,7 @@ export default function ProjectRow({
 
             </td>
 
-            <td className="actions">
+            <td className="actions-project">
 
                 <Link to={`/projects/${project.id}`}>
 

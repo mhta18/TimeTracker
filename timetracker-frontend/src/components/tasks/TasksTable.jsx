@@ -12,7 +12,7 @@ export default function TasksTable({
 
     return (
 
-        <table className="project-table">
+        <table className="task-table">
 
             <thead>
 

@@ -14,6 +14,7 @@ import Tasks from './pages/Tasks';
 import TaskFormPage from './pages/TaskFormPage';
 import Teams from './pages/Teams';
 import TeamPage from './pages/TeamPage';
+import Timer from './pages/Timer';
 import './App.css'
 
 function App() {
@@ -85,11 +86,11 @@ function App() {
             element={<TeamPage />}
           />
 
-          {/* <Route
+          <Route
               path="/timer"
               element={<Timer />}
             />
-
+{/* 
             <Route
               path="/history"
               element={<History />}

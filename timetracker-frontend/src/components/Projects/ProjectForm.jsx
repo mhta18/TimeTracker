@@ -144,7 +144,7 @@ export default function ProjectForm({
 
             </div>
 
-            <button type="submit" className="submit-btn">
+            <button type="submit" className="submit-btn-project">
                 {isEdit ? "Update Project" : "Create Project"}
             </button>
         </form>

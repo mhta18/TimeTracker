@@ -76,23 +76,7 @@
 
 }
 
-.cancel-btn {
-
-    padding: 12px 22px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: #e5e7eb;
-
-    cursor: pointer;
-
-    font-weight: 600;
-
-}
-
-.submit-btn {
+.submit-btn-project {
 
     padding: 12px 26px;
 
@@ -112,7 +96,7 @@
 
 }
 
-.submit-btn:hover {
+.submit-btn-project:hover {
 
     background: #4636ec;
 

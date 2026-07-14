@@ -1,6 +1,5 @@
 import TeamRow from "./TeamRow";
 
-import "./TeamTable.css";
 
 
 export default function TeamTable({
