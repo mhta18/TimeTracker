@@ -38,10 +38,27 @@ async function getSupervisors() {
 
 }
 
+async function getMembers()
+{
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            username
+        FROM users
+        WHERE role='member'
+        ORDER BY username;
+        `
+    );
+
+    return result.rows;
+}
+
 
 
 module.exports = {
     findUserByUsername,
     getSupervisors,
-    createUser
+    createUser,
+    getMembers
 };

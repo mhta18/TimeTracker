@@ -10,6 +10,7 @@ async function getCurrentUser(req, res) {
 
 }
 
+
 async function register(req, res) {
     try {
         const { username, password, role } = req.body;
@@ -104,11 +105,33 @@ async function getSupervisors(req, res) {
 
 }
 
+async function getMembers(req,res)
+{
+    try {
+
+        const members = await authService.getMembers();
+
+        res.json(members);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+}
 
 module.exports = {
     register,
     login,
     logout,
     getCurrentUser,
-    getSupervisors
+    getSupervisors,
+    getMembers
 };

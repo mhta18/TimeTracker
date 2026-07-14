@@ -36,7 +36,8 @@ router.delete(
 );
 
 // for supervisors to add/remove/get members from their teams
-router.get("/:id/members",supervisorMiddleware,controller.getTeamMembers);//?
+router.get("/:id/members", authMiddleware, controller.getTeamMembers);//?
+
 router.post(
     "/:id/members",
     supervisorMiddleware,

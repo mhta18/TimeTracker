@@ -1,36 +1,39 @@
 const pool = require("../../config/db");
 
-async function createTeam(name, description, supervisorId) {
-
+async function createTeam(name, description, supervisorId, memberIds = []) {
     const result = await pool.query(
         `
-        INSERT INTO teams
-        (name, description, supervisor_id)
-
-        VALUES($1,$2,$3)
-
+        INSERT INTO teams (name, description, supervisor_id)
+        VALUES ($1, $2, $3)
         RETURNING *;
         `,
         [name, description, supervisorId]
     );
 
-    return result.rows[0];
+    const newTeam = result.rows[0];
+    console.log("memberIds:", memberIds);
+    if (memberIds && memberIds.length > 0) {
+        for (const memberId of memberIds) {
+            await pool.query(
+                `
+                INSERT INTO team_members (team_id, user_id)
+                VALUES ($1, $2);
+                `,
+                [newTeam.id, memberId]
+            );
+        }
+    }
+
+    return newTeam;
 }
 
 async function getTeamMembers(teamId) {
     const result = await pool.query(
-        `
-        SELECT
-            u.id,
-            u.username,
-        FROM team_members tm
-        JOIN users u
-            ON tm.user_id = u.id
-
-        WHERE tm.team_id = $1
-
-        ORDER BY u.username;
-        `,
+        `SELECT u.id, u.username
+         FROM team_members tm
+         JOIN users u ON tm.user_id = u.id
+         WHERE tm.team_id = $1
+         ORDER BY u.username;`,
         [teamId]
     );
 
@@ -96,32 +99,44 @@ async function getSupervisors() {
 }
 
 
-async function updateTeam(id, name, description, supervisorId) {
-
+async function updateTeam(id, name, description, supervisorId, memberIds = []) {
     const result = await pool.query(
         `
         UPDATE teams
-
         SET
             name = $1,
             description = $2,
             supervisor_id = $3
-
         WHERE id = $4
-
         RETURNING *;
         `,
-        [
-            name,
-            description,
-            supervisorId,
-            id
-        ]
+        [name, description, supervisorId, id]
     );
 
-    return result.rows[0];
-}
+    const updatedTeam = result.rows[0];
 
+    await pool.query(
+        `
+        DELETE FROM team_members
+        WHERE team_id = $1;
+        `,
+        [id]
+    );
+
+    if (memberIds && memberIds.length > 0) {
+        for (const memberId of memberIds) {
+            await pool.query(
+                `
+                INSERT INTO team_members (team_id, user_id)
+                VALUES ($1, $2);
+                `,
+                [id, memberId]
+            );
+        }
+    }
+
+    return updatedTeam;
+}
 
 async function deleteTeam(id) {
 

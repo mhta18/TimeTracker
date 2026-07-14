@@ -24,21 +24,13 @@ export default function TeamTable({
                         Name
                     </th>
 
-
                     <th>
                         Supervisor
                     </th>
 
-
-                    <th>
-                        Members
-                    </th>
-
-
                     <th>
                         Created
                     </th>
-
 
                     <th>
                         Actions

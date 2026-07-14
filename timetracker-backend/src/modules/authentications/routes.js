@@ -13,4 +13,10 @@ router.get(
     authMiddleware,
     controller.getSupervisors
 );
+
+router.get(
+    "/members",
+    authMiddleware,
+    controller.getMembers
+);
 module.exports = router;

@@ -4,16 +4,11 @@ async function createTeam(req, res) {
 
     try {
 
-        const { name,description,supervisor_id } = req.body;
+        const { name, description, supervisor_id, member_ids } = req.body;
 
-        const team =
-            await teamService.createTeam(
-                name,
-                description,
-                supervisor_id
-            );
+        const newTeam = await teamService.createTeam(name, description, supervisor_id, member_ids);
 
-        res.status(201).json(team);
+        res.status(201).json(newTeam);
 
     } catch (error) {
 
@@ -306,5 +301,6 @@ module.exports = {
     deleteTeam,
     addMember,
     removeMember,
-    getTeamMembers
+    getTeamMembers,
+
 };

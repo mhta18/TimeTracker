@@ -33,13 +33,6 @@ export default function TeamRow({
             <td>
 
                 {
-                    team.member_count || 0
-                }
-
-            </td>
-            <td>
-
-                {
                     new Date(
                         team.created_at
                     )
