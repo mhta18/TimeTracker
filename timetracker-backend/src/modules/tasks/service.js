@@ -1,9 +1,9 @@
 const pool = require("../../config/db");
 
 const VALID_STATUS = [
-    "todo",
-    "in_progress",
-    "completed"
+    "To_DO",
+    "In_Progress",
+    "Completed"
 ];
 
 async function createTask(
@@ -158,11 +158,15 @@ async function getTaskById(id, userId, role) {
         query = `
             SELECT
                 tasks.*,
-                p.name AS project_name
+                p.name AS project_name,
+                tasks.assigned_to AS assigned_to_name
             FROM tasks
             JOIN projects p
                 ON tasks.project_id = p.id
+            JOIN users
+                ON users.id = tasks.assigned_to
             WHERE tasks.id = $1;
+   
         `;
 
         values = [id];
@@ -170,21 +174,19 @@ async function getTaskById(id, userId, role) {
     } else {
 
         query = `
-            SELECT
-                tasks.*,
-                p.name AS project_name
+            SELECT 
+                tasks.*, 
+                p.name AS project_name, 
+                users.username AS assigned_to_name
             FROM tasks
-            JOIN projects p
+            LEFT JOIN projects p 
                 ON tasks.project_id = p.id
-            WHERE tasks.id = $1
-              AND (
-                    tasks.created_by = $2
-                    OR tasks.assigned_to = $2
-                  );
+            LEFT JOIN users 
+                ON tasks.assigned_to = users.id
+            WHERE tasks.id = $1 
+              AND (tasks.created_by = $2 OR tasks.assigned_to = $2);
         `;
-
         values = [id, userId];
-
     }
 
     const result = await pool.query(query, values);
